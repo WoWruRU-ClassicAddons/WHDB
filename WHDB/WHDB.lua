@@ -1,6 +1,21 @@
 -----------------------------------------------------------
 -- Wowhead DB By: UniRing
 -----------------------------------------------------------
+
+if GetLocale() == "ruRU" then
+	itemData = itemData_ruRU;
+	npcData = npcData_ruRU;
+	qData = qData_ruRU;
+	zoneData = zoneData_ruRU;
+else
+	itemData = itemData_Eng;
+	npcData = npcData_Eng;
+	qData = qData_Eng;
+	zoneData = zoneData_Eng;
+end
+
+local L = AceLibrary("AceLocale-2.2"):new("WHDBTextLocal")
+
 WHDB_MAP_NOTES = {};
 WHDB_QuestZoneInfo = {};
 WHDB_Player = "";
@@ -16,7 +31,7 @@ function WHDB_Event(event)
 		if (Cartographer_Notes ~= nil) then
 			WHDBDB = {}; WHDBDBH = {};
 			Cartographer_Notes:RegisterNotesDatabase("WHDB",WHDBDB,WHDBDBH);
-			WHDB_Print("Cartographer Database Registered.");
+			WHDB_Print(L["Cartographer Database Registered."]);
 		end
 		--Free the oposite faction database. -- not working in 1.12.1 UnitFactionGroup not init yet
 		---WHDB_Print(UnitFactionGroup("player"));
@@ -40,26 +55,26 @@ function WHDB_Event(event)
 			end
 		end
 		WHDB_ShowUsingInfo();
-		WHDB_Print("WHDB Loaded.");
+		WHDB_Print(L["WHDB Loaded."]);
 	end
 end
 
 function WHDB_ShowUsingInfo()
 	if (EQL3_QuestLogFrame ~= nil) then
-		WHDB_Print("Using EQL3.");
+		WHDB_Print(L["Using EQL3."]);
 	elseif (QuestGuru_QuestLogFrame ~= nil) then
-		WHDB_Print("Using QuestGuru.");
+		WHDB_Print(L["Using QuestGuru."]);
 	else
-		WHDB_Print("Using default quest log.");
+		WHDB_Print(L["Using default quest log."]);
 	end
 	if (MetaMap_DeleteNotes ~= nil) then
-		WHDB_Print("MetaMap plotter enabled.");
+		WHDB_Print(L["MetaMap plotter enabled."]);
 	end
 	if (Cartographer_Notes ~= nil) then
-		WHDB_Print("Cartographer plotter enabled.");
+		WHDB_Print(L["Cartographer plotter enabled."]);
 	end
 	if (MapNotes_Data_Notes ~= nil) then
-		WHDB_Print("MapNotes plotter enabled.");
+		WHDB_Print(L["MapNotes plotter enabled."]);
 	end
 end
 
@@ -69,17 +84,17 @@ function WHDB_Slash(input)
 		tinsert(params, v);
 	end
 	if (params[1] == "help" or params[1] == "") then
-		WHDB_Print("Commands available:");
+		WHDB_Print(L["Commands available:"]);
 		WHDB_Print("-------------------------------------------------------");
-		WHDB_Print("/whdb help | This help.");
-		WHDB_Print("/whdb com <quest name> | Get quest comments by quest name.");
-		WHDB_Print("/whdb item <item name> | Get item drop info and show map if possible.");
-		WHDB_Print("/whdb mob <monster name> | Get monser location and show map if possible.");
-		WHDB_Print("/whdb clean | Clean map notes.");
-		WHDB_Print("/whdb colors <0 or 1>| Enable/Disable coloring of text in the quest log.");
-		WHDB_Print("/whdb copy <character>| Copy characters config to current one.");
+		WHDB_Print(L["/whdb help | This help."]);
+		WHDB_Print(L["/whdb com <quest name> | Get quest comments by quest name."]);
+		WHDB_Print(L["/whdb item <item name> | Get item drop info and show map if possible."]);
+		WHDB_Print(L["/whdb mob <monster name> | Get monser location and show map if possible."]);
+		WHDB_Print(L["/whdb clean | Clean map notes."]);
+		WHDB_Print(L["/whdb colors <0 or 1>| Enable/Disable coloring of text in the quest log."]);
+		WHDB_Print(L["/whdb copy <character>| Copy characters config to current one."]);
 		WHDB_Print("");
-		WHDB_Print("Note: All parameters are case sensitive!");
+		WHDB_Print(L["Note: All parameters are case sensitive!"]);
 	end
 	if (params[1] == "com") then
 		local questName = strtrim(string.sub(input, 5));
@@ -91,7 +106,7 @@ function WHDB_Slash(input)
 			end
 		end
 		if (questName ~= "") then
-			WHDB_Print("Quest Comments");
+			WHDB_Print(L["Quest Comments"]);
 			WHDB_Print("---------------------------------------------------");
 			local QuestComments = WHDB_GetComments(questName);
 			for v in string.gmatch(QuestComments, "[^\n]+") do
@@ -104,7 +119,7 @@ function WHDB_Slash(input)
 		if (string.sub(itemName,1,1) == "|") then
 			_, _, _, itemName = string.find(itemName, "^|c%x+|H(.+)|h%[(.+)%]")
 		end
-		WHDB_Print("Drops for: "..itemName);
+		WHDB_Print(L["Drops for: "]..itemName);
 		WHDB_Print("---------------------------------------------------");
 		if (itemName ~= "") then
 			if (itemData[itemName] ~= nil) then
@@ -114,17 +129,17 @@ function WHDB_Slash(input)
 					if (zoneName == nil) then zoneName = npcData[monsterName]["zone"]; end
 					local dropRate = monsterDrop;
 					if (dropRate == nil) then dropRate = ""; else dropRate = dropRate .. "%"; end
-					WHDB_Print("Dropped by: " .. monsterName);
-					WHDB_Print_Indent("Drop Rate: " .. dropRate);
-					WHDB_Print_Indent("Zone: " .. zoneName);
-					WHDB_Print_Indent("Coords: " .. npcData[monsterName]["coords"][1]);
+					WHDB_Print(L["Dropped by: "] .. monsterName);
+					WHDB_Print_Indent(L["Drop Rate: "] .. dropRate);
+					WHDB_Print_Indent(L["Zone: "] .. zoneName);
+					WHDB_Print_Indent(L["Coords: "] .. npcData[monsterName]["coords"][1]);
 					-- Map plotting
 					if (MetaMapNotes_AddNewNote ~= nil or MapNotes_Data_Notes ~= nil or Cartographer_Notes ~= nil) then
 						local showMap = false;
 						WHDB_MAP_NOTES = {};
 						for cid, cdata in pairs(npcData[monsterName]["coords"]) do
 							local f, t, coordx, coordy = strfind(npcData[monsterName]["coords"][cid], "(.*),(.*)");
-							table.insert(WHDB_MAP_NOTES,{zoneName, coordx, coordy, itemName, monsterName .. "\nDrop: " .. dropRate, 0});
+							table.insert(WHDB_MAP_NOTES,{zoneName, coordx, coordy, itemName, monsterName .. L["\nDrop: "] .. dropRate, 0});
 							if (MetaMapNotes_AddNewNote ~= nil or MapNotes_Data_Notes ~= nil or Cartographer_Notes ~= nil) then 
 								showMap = true;
 							end
@@ -135,7 +150,7 @@ function WHDB_Slash(input)
 					end					
 					showmax = showmax - 1;
 					if (showmax == 0) then
-						WHDB_Print("Showing only the 5 first results.");
+						WHDB_Print(L["Showing only the 5 first results."]);
 						break;
 					end
 				end
@@ -145,13 +160,13 @@ function WHDB_Slash(input)
 	if (params[1] == "mob") then
 		local monsterName = strtrim(string.sub(input, 5));
 		if (monsterName ~= "") then
-			WHDB_Print("Location for: "..monsterName);
+			WHDB_Print(L["Location for: "]..monsterName);
 			if (monsterName ~= nil) then
 				if (npcData[monsterName] ~= nil) then
 					zoneName = zoneData[npcData[monsterName]["zone"]];
 					if (zoneName == nil) then zoneName = npcData[monsterName]["zone"]; end
-					WHDB_Print_Indent("Zone: " .. zoneName);
-					WHDB_Print_Indent("Coords: " .. npcData[monsterName]["coords"][1]);
+					WHDB_Print_Indent(L["Zone: "] .. zoneName);
+					WHDB_Print_Indent(L["Coords: "] .. npcData[monsterName]["coords"][1]);
 					-- Map plotting
 					if (MetaMapNotes_AddNewNote ~= nil or MapNotes_Data_Notes ~= nil or Cartographer_Notes ~= nil) then
 						local showMap = false;
@@ -177,11 +192,11 @@ function WHDB_Slash(input)
 	if (params[1] == "colors") then
 		if (params[2] == "1") then
 			WHDB_Settings[WHDB_Player]["UseColors"] = 1;
-			WHDB_Print("Text colors enabled.");
+			WHDB_Print(L["Text colors enabled."]);
 		end
 		if (params[2] == "0") then
 			WHDB_Settings[WHDB_Player]["UseColors"] = 0;
-			WHDB_Print("Text colors disabled.");
+			WHDB_Print(L["Text colors disabled."]);
 		end
 	end
 	if (params[1] == "copy") then
@@ -189,9 +204,9 @@ function WHDB_Slash(input)
 			for k,v in pairs(WHDB_Settings[params[2]]) do
 				WHDB_Settings[WHDB_Player][k] = v;
 			end
-			WHDB_Print("Settings loaded.");
+			WHDB_Print(L["Settings loaded."]);
 		else
-			WHDB_Print("There are no settings for this character.");
+			WHDB_Print(L["There are no settings for this character."]);
 		end
 	end
 end
@@ -268,7 +283,7 @@ function WHDB_QuestLog_UpdateQuestDetails(prefix, doNotScroll)
 		end
 
 		if (type == "monster") then
-			local i, j, monsterName = strfind(itemName, "(.*) slain");
+			local i, j, monsterName = strfind(itemName, L["(.*) slain"]);
 			if (monsterName ~= nil) then
 				if (npcData[monsterName] ~= nil) then
 					if (npcData[monsterName]["zone"] ~= nil) then
@@ -278,20 +293,20 @@ function WHDB_QuestLog_UpdateQuestDetails(prefix, doNotScroll)
 					end
 					Level = npcData[monsterName]["level"];
 					HP = npcData[monsterName]["hp"];
-					if (Level == nil) then Level = "Unknown"; end
-					if (HP == nil) then HP = "Unknown"; end
+					if (Level == nil) then Level = L["Unknown"]; end
+					if (HP == nil) then HP = L["Unknown"]; end
 					if (zoneName == nil) then zoneName = npcData[monsterName]["zone"]; end
 					text = text.."\n";
 					if (WHDB_Settings[WHDB_Player]["UseColors"] == 1) then
-						text = text.."|cFF442200    Zone: " .. zoneName .. "\n|r";
-						text = text.."|cFF002244    Level: " .. Level .. "\n|r";
-						text = text.."|cFF002244    Health: " .. HP .. "\n|r";
-						text = text.."|cFF224400    Coords: " .. npcData[monsterName]["coords"][1] .. "\n|r";
+--						text = text.."|cFF442200    " .. L["Zone: "] .. zoneName .. "\n|r";
+--						text = text.."|cFF002244    " .. L["Level: "] .. Level .. "\n|r";
+--						text = text.."|cFF002244    " .. L["Health: "] .. HP .. "\n|r";
+--						text = text.."|cFF224400    " .. L["Coords: "] .. npcData[monsterName]["coords"][1] .. "\n|r";
 					else
-						text = text.."    Zone: " .. zoneName .. "\n";
-						text = text.."    Level: " .. Level .. "\n";
-						text = text.."    Health: " .. HP .. "\n";
-						text = text.."    Coords: " .. npcData[monsterName]["coords"][1] .. "\n";
+--						text = text.."    " .. L["Zone: "] .. zoneName .. "\n";
+--						text = text.."    " .. L["Level: "] .. Level .. "\n";
+--						text = text.."    " .. L["Health: "] .. HP .. "\n";
+--						text = text.."    " .. L["Coords: "] .. npcData[monsterName]["coords"][1] .. "\n";
 					end
 					if (MetaMapNotes_AddNewNote ~= nil or MapNotes_Data_Notes ~= nil or Cartographer_Notes ~= nil) then
 						for cid, cdata in pairs(npcData[monsterName]["coords"]) do
@@ -316,24 +331,24 @@ function WHDB_QuestLog_UpdateQuestDetails(prefix, doNotScroll)
 						end
 						Level = npcData[monsterName]["level"];
 						HP = npcData[monsterName]["hp"];
-						if (Level == nil) then Level = "Unknown"; end
-						if (HP == nil) then HP = "Unknown"; end
+						if (Level == nil) then Level = L["Unknown"]; end
+						if (HP == nil) then HP = L["Unknown"]; end
 						if (zoneName == nil) then zoneName = npcData[monsterName]["zone"]; end
 						local dropRate = monsterDrop;
 						if (dropRate == nil) then dropRate = ""; else dropRate = dropRate .. "%"; end
-						text = text.."\n";
+--						text = text.."\n";
 
-							text = text.."    Dropped by: " .. monsterName .. "\n";
-							text = text.."        Drop Rate: " .. dropRate .. "\n";
-							text = text.."        Zone: " .. zoneName .. "\n";
-							text = text.."        Level: " .. Level .. "\n";
-							text = text.."        Health: " .. HP .. "\n";
-							text = text.."        Coords: " .. npcData[monsterName]["coords"][1] .. "\n";
+--							text = text.."    " .. L["Dropped by: "] .. monsterName .. "\n";
+--							text = text.."        " .. L["Drop Rate: "] .. dropRate .. "\n";
+--							text = text.."        " .. L["Zone: "] .. zoneName .. "\n";
+--							text = text.."        " .. L["Level: "] .. Level .. "\n";
+--							text = text.."        " .. L["Health: "] .. HP .. "\n";
+--							text = text.."        " .. L["Coords: "] .. npcData[monsterName]["coords"][1] .. "\n";
 						
 						if (MetaMapNotes_AddNewNote ~= nil or MapNotes_Data_Notes ~= nil or Cartographer_Notes ~= nil) then
 							for cid, cdata in pairs(npcData[monsterName]["coords"]) do
 								local f, t, coordx, coordy = strfind(npcData[monsterName]["coords"][cid], "(.*),(.*)");
-								table.insert(WHDB_MAP_NOTES,{zoneName, coordx, coordy, questTitle, monsterName .. "\nDrop: " .. dropRate, 0});
+								table.insert(WHDB_MAP_NOTES,{zoneName, coordx, coordy, questTitle, monsterName .. L["\nDrop: "] .. dropRate, 0});
 								if (MetaMapNotes_AddNewNote ~= nil or MapNotes_Data_Notes ~= nil or Cartographer_Notes ~= nil) then 
 									showMap = true;
 								end
@@ -343,7 +358,6 @@ function WHDB_QuestLog_UpdateQuestDetails(prefix, doNotScroll)
 				end
 			end
 		end
-
 		string:SetText(text);
 		string:Show();
 		QuestFrame_SetAsLastShown(string);
@@ -409,14 +423,14 @@ function WHDB_QuestLog_UpdateQuestDetails(prefix, doNotScroll)
 	getglobal(prefix.."QuestLogMapButtonsTitle"):SetWidth(285);
 	getglobal(prefix.."QuestLogMapButtonsTitle"):SetPoint("TOPLEFT", prefix.."QuestLogQuestDescription", "BOTTOMLEFT", 0, -15);
 	getglobal(prefix.."QuestLogMapButtonsTitle"):SetJustifyH("LEFT");
-	getglobal(prefix.."QuestLogMapButtonsTitle"):SetText("Map Plots");
+	getglobal(prefix.."QuestLogMapButtonsTitle"):SetText(L["Map Plots"]);
 	getglobal(prefix.."QuestLogMapButtonsTitle"):SetTextColor(r, g, b, a);
 	
 	getglobal(prefix.."QuestLogCommentsTitle"):SetHeight(0);
 	getglobal(prefix.."QuestLogCommentsTitle"):SetWidth(285);
 	getglobal(prefix.."QuestLogCommentsTitle"):SetPoint("TOPLEFT", prefix.."QuestLogMapButtonsTitle", "BOTTOMLEFT", 0, -50);
 	getglobal(prefix.."QuestLogCommentsTitle"):SetJustifyH("LEFT");
-	getglobal(prefix.."QuestLogCommentsTitle"):SetText("Comments");
+	getglobal(prefix.."QuestLogCommentsTitle"):SetText(L["Comments"]);
 	getglobal(prefix.."QuestLogCommentsTitle"):SetTextColor(r, g, b, a);
 
 	getglobal(prefix.."QuestLogCommentsDescription"):SetHeight(0);
@@ -461,7 +475,7 @@ function WHDB_QuestLog_UpdateQuestDetails(prefix, doNotScroll)
 				if (MetaMapNotes_AddNewNote ~= nil or MapNotes_Data_Notes ~= nil or Cartographer_Notes ~= nil) then
 					for cid, cdata in pairs(npcData[monsterName]["coords"]) do
 						local f, t, coordx, coordy = strfind(npcData[monsterName]["coords"][cid], "(.*),(.*)");
-						table.insert(WHDB_MAP_NOTES,{zoneName, coordx, coordy, "END: "..questTitle, monsterName, 2});
+						table.insert(WHDB_MAP_NOTES,{zoneName, coordx, coordy, L["END: "]..questTitle, monsterName, 2});
 						if (MetaMapNotes_AddNewNote ~= nil or MapNotes_Data_Notes ~= nil or Cartographer_Notes ~= nil) then							
 							showMap = true;
 						end
@@ -476,14 +490,14 @@ function WHDB_QuestLog_UpdateQuestDetails(prefix, doNotScroll)
 		CreateFrame("Button", prefix.."QuestLogCleanMap", getglobal(prefix.."QuestLogDetailScrollChildFrame"), "UIPanelButtonTemplate");
 	end
 	
-	getglobal(prefix.."QuestLogShowMap"):SetText("Show Map");
+	getglobal(prefix.."QuestLogShowMap"):SetText(L["Show Map"]);
 	getglobal(prefix.."QuestLogShowMap"):SetPoint("TOPLEFT", prefix.."QuestLogMapButtonsTitle", "BOTTOMLEFT", 0, -10);
 	getglobal(prefix.."QuestLogShowMap"):SetHeight(25);
 	getglobal(prefix.."QuestLogShowMap"):SetWidth(105);
 	getglobal(prefix.."QuestLogShowMap"):RegisterForClicks("LeftButtonUp");
 	getglobal(prefix.."QuestLogShowMap"):SetScript("OnClick", WHDB_ShowMap);
 	
-	getglobal(prefix.."QuestLogCleanMap"):SetText("Clean Map");
+	getglobal(prefix.."QuestLogCleanMap"):SetText(L["Clean Map"]);
 	getglobal(prefix.."QuestLogCleanMap"):SetPoint("TOPLEFT", prefix.."QuestLogMapButtonsTitle", "BOTTOMLEFT", 110, -10);
 	getglobal(prefix.."QuestLogCleanMap"):SetHeight(25);
 	getglobal(prefix.."QuestLogCleanMap"):SetWidth(105);
@@ -589,10 +603,10 @@ function WHDB_PlotNotesOnMap()
 					MapNotes_Data_Notes[key][Id].xPos = nData[2]/100;
 					MapNotes_Data_Notes[key][Id].yPos = nData[3]/100;
 				else
-					WHDB_Print("Error: MapNotes can't find the map.");
+					WHDB_Print(L["Error: MapNotes can't find the map."]);
 				end
 			else
-				WHDB_Print("Error: Map doesn't exist!");
+				WHDB_Print(L["Error: Map doesn't exist!"]);
 			end
 		end
 		if (nData[1] ~= nil) then
@@ -622,8 +636,21 @@ function WHDB_GetComments(questTitle)
 			questComments = questComments .. comment .."\n\n";
 		end
 	else
-		questComments = questComments  .. "No comments for this quest.\n\n";
+		if questRu[questTitle] ~= nil then
+			if questEng[questRu[questTitle]["id"]] ~= nil then
+				questTitle = questEng[questRu[questTitle]["id"]]
+			end
+		end
+
+	if (qData[UnitFactionGroup("player")][questTitle] ~= nil) then
+		for id, comment in ipairs(qData[UnitFactionGroup("player")][questTitle]['comments']) do
+			questComments = questComments .. comment .."\n\n";
+		end
+	else
+		questComments = questComments  .. L["No comments for this quest.\n\n"];
+		end
 	end
+	
 	questComments = questComments .. "";
 	return questComments;
 end
@@ -677,7 +704,12 @@ end
 function SearchEndNPC(quest)
 	for npc, data in pairs(npcData) do
 		if (data["ends"] ~= nil) then
-			if (data["ends"][1] == quest or data["ends"][2] == quest or data["ends"][3] == quest or data["ends"][4] == quest or data["ends"][5] == quest) then
+			if (data["ends"][1] == quest or data["ends"][2] == quest or data["ends"][3] == quest or data["ends"][4] == quest or data["ends"]
+			[5] == quest or data["ends"][6] == quest or data["ends"][7] == quest or data["ends"][8] == quest or data["ends"]
+			[9] == quest or data["ends"][10] == quest or data["ends"][11] == quest or data["ends"][12] == quest or data["ends"]
+			[13] == quest or data["ends"][14] == quest or data["ends"][15] == quest or data["ends"][16] == quest or data["ends"]
+			[17] == quest or data["ends"][18] == quest or data["ends"][19] == quest or data["ends"][20] == quest or data["ends"]
+			[21] == quest) then
 				return npc;
 			end
 		end

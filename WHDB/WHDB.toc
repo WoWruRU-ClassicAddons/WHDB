@@ -1,9 +1,10 @@
-## Interface: 20300 
-## Title: |cFF006699[BSK]|cFF990099 Wowhead DB
-## Author: UniRing | B�rs�rk
+## Interface: 11200 
+## Title: |cFF006699[BSK]|cFF990099 Wowhead DB |cff7fff7f -Ace2-|r
+## Author: UniRing | Bлrsлrk
 ## Notes: Wowhead quest info and map plotting. (Supports Cartographer and Metamap)
+## Notes-ruRU: Информация о заданиях и их позициях с Wowhead (Поддерживает Cartographer и Metamap)
 ## Version: 1.8
-## RequiredDeps:
+## RequiredDeps: !Libs
 ## OptionalDeps: Cartographer, Cartographer_Notes, EQL3
 ## SavedVariables: WHDB_Settings
 WHDB.xml
